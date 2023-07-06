@@ -1,8 +1,8 @@
 {
   "name": "studio.nekomimi.parser.xml",
-  "displayName": "studio.nekomimi.parser.xml",
+  "displayName": "nS XMLParser",
   "version": "0.0.1",
-  "description": "Describe this Package",
+  "description": "XML Parser.",
   "dependencies": {},
   "gitDependencies": {},
   "vpmDependencies": {
@@ -14,6 +14,5 @@
     "url": "https://nekomimi.studio/"
   },
   "legacyFolders": {},
-  "legacyFiles": {},
-  "localPath": "D:\\VRChatProjects\\Udon\\XMLParser\\Packages\\studio.nekomimi.parser.xml"
+  "legacyFiles": {}
 }
