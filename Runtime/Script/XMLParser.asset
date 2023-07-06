@@ -20,7 +20,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 0
   hasInteractEvent: 0
-  scriptID: -5293167627689783916
+  scriptID: -8148420154417308952
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -271,7 +271,7 @@ MonoBehaviour:
       Data: 14|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: XMLParser_Callback, studio.nekomimi.parser.xml
+      Data: nekomimiStudio.parser.xml.XMLParser_Callback, studio.nekomimi.parser.xml
     - Name: 
       Entry: 8
       Data: 

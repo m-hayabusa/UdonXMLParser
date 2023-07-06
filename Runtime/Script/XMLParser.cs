@@ -2,7 +2,7 @@
 using UdonSharp;
 using VRC.SDK3.Data;
 
-namespace studio.nekomimi.parser.xml
+namespace nekomimiStudio.parser.xml
 {
     public class XMLParser : UdonSharpBehaviour
     {
