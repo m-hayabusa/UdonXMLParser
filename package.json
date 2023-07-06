@@ -1,0 +1,19 @@
+{
+  "name": "studio.nekomimi.parser.xml",
+  "displayName": "studio.nekomimi.parser.xml",
+  "version": "0.0.1",
+  "description": "Describe this Package",
+  "dependencies": {},
+  "gitDependencies": {},
+  "vpmDependencies": {
+    "com.vrchat.udonsharp": "1.1.8"
+  },
+  "author": {
+    "name": "mewl hayabusa",
+    "email": "mewl@mewl.me",
+    "url": "https://nekomimi.studio/"
+  },
+  "legacyFolders": {},
+  "legacyFiles": {},
+  "localPath": "D:\\VRChatProjects\\Udon\\XMLParser\\Packages\\studio.nekomimi.parser.xml"
+}
