@@ -1,4 +1,4 @@
-
+﻿
 using UdonSharp;
 using VRC.SDK3.Data;
 
@@ -300,15 +300,16 @@ namespace studio.nekomimi.parser.xml
         private DataList cb_path;
         private string cb_data;
         private string cb_callbackId;
+        public float cb_frameLimit = 0.005F;
 
         public void ParseWithCallback(string input, XMLParser_Callback callback, string callbackId)
         {
             var parser = Instantiate(this.gameObject, this.transform);
             parser.transform.parent = this.transform;
-            parser.GetComponent<XMLParser>()._ParseWithCallback(input, callback, callbackId);
+            parser.GetComponent<XMLParser>()._ParseWithCallback(input, callback, callbackId, cb_frameLimit);
         }
 
-        protected void _ParseWithCallback(string input, XMLParser_Callback callback, string callbackId)
+        protected void _ParseWithCallback(string input, XMLParser_Callback callback, string callbackId, float frameLimit)
         {
             cb_path = new DataList();
             cb_path.Add(XMLParser.InitDictionary());
@@ -317,6 +318,7 @@ namespace studio.nekomimi.parser.xml
             cb_inCdataSection = false;
             cb_target = callback;
             cb_callbackId = callbackId;
+            cb_frameLimit = frameLimit;
 
             cb_ready = true;
         }
@@ -333,7 +335,7 @@ namespace studio.nekomimi.parser.xml
                 state.Add("data", cb_data);
 
                 var time = UnityEngine.Time.realtimeSinceStartup;
-                while (UnityEngine.Time.realtimeSinceStartup - time < 0.01F)
+                while (UnityEngine.Time.realtimeSinceStartup - time < cb_frameLimit)
                 {
                     if (cb_head < cb_input.Length)
                     {
