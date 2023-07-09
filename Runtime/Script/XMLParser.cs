@@ -178,19 +178,31 @@ namespace nekomimiStudio.parser.xml
 
                         var attr = new DataDictionary();
 
-                        for (int i = 1; i < t.Length; i++) //TODO: スペースが混じってる場合について ("を見てフラグたててやっていき)
+                        var attr_head = data.IndexOfAny(new char[] { ' ', '\n' });
+                        while (data.Length > attr_head + 1 && attr_head != -1)
                         {
-                            if (t[i].Trim() == "")
-                                break;
+                            attr_head++;
+                            var attr_end = data.IndexOfAny(new char[] { '=', ' ', '\n', '/', '>' }, attr_head);
+                            if (attr_end == -1) attr_end = data.Length - 1;
+                            var key = data.Substring(attr_head, attr_end - attr_head);
+                            attr_head = attr_end;
 
-                            var a = t[i].Split('=');
-                            var key = a[0];
-                            a[0] = "";
-                            var val = System.String.Join("", a);
+                            if (key.Trim() == "") continue;
 
+                            var val = "";
+                            if (data[attr_head] == '=')
+                            {
+                                attr_end = data.IndexOf(data[attr_head + 1], attr_head + 2);
+                                if (attr_end == -1) attr_end = data.Length - 1;
+
+                                val = data.Substring(attr_head + 2, attr_end - attr_head - 2);
+                                attr_end += 1;
+                            }
                             attr.Add(key, val);
-                            // Debug.Log(pathToStr(path) + "/" + t[0] + "\t" + key + ":" + val);
+
+                            attr_head = attr_end;
                         }
+
                         elem.Add("attribute", attr);
                         elem.Add("children", new DataList());
 
