@@ -79,7 +79,7 @@ namespace nekomimiStudio.parser.xml
             else
                 return "";
         }
-        public static DataDictionary Parse(string input)
+        public static DataDictionary Parse(string xml)
         {
             DataList path = new DataList();
 
@@ -95,9 +95,9 @@ namespace nekomimiStudio.parser.xml
             state.Add("inCdataSection", inCdataSection);
             state.Add("data", data);
 
-            while (head < input.Length)
+            while (head < xml.Length)
             {
-                state = _Parse(state, path, input, head, inCdataSection, data);
+                state = _Parse(state, path, xml, head, inCdataSection, data);
 
                 DataToken token;
 
@@ -272,29 +272,35 @@ namespace nekomimiStudio.parser.xml
             return state;
         }
 
+        public static string Render(DataDictionary elem)
+        {
+            return XMLParser._Render(elem, 0);
+        }
+
         [RecursiveMethod]
-        public static void Render(DataDictionary elem, int depth)
+        protected static string _Render(DataDictionary elem, int depth)
         {
             DataToken tag, attr, children;
             elem.TryGetValue("tag", TokenType.String, out tag);
             elem.TryGetValue("attribute", TokenType.DataDictionary, out attr);
             elem.TryGetValue("children", TokenType.DataList, out children);
-            UnityEngine.Debug.Log(new string('\t', depth) + tag);
+            string result = new string('\t', depth) + tag + '\n';
 
             foreach (var key in attr.DataDictionary.GetKeys().ToArray())
             {
                 DataToken val;
                 attr.DataDictionary.TryGetValue(key, out val);
-                UnityEngine.Debug.Log(new string('\t', depth) + tag + "\t" + key + ": " + val);
+                result += new string('\t', depth) + tag + "\t" + key + ": " + val + '\n';
             }
 
             foreach (var c in children.DataList.ToArray())
             {
                 if (c.TokenType == TokenType.DataDictionary)
-                    Render(((DataDictionary)c), depth + 1);
+                    result += _Render(((DataDictionary)c), depth + 1) + '\n';
                 else
-                    UnityEngine.Debug.Log(new string('\t', depth + 1) + c);
+                    result += new string('\t', depth + 1) + c + '\n';
             }
+            return result;
         }
 
         private static DataDictionary InitDictionary()
@@ -314,25 +320,25 @@ namespace nekomimiStudio.parser.xml
         private DataList cb_path;
         private string cb_data;
         private string cb_callbackId;
-        public float cb_frameLimit = 0.005F;
+        public float frameLimit = 0.005F;
 
-        public void ParseWithCallback(string input, XMLParser_Callback callback, string callbackId)
+        public void ParseAsync(string xml, XMLParser_Callback callback, string callbackId)
         {
             var parser = Instantiate(this.gameObject, this.transform);
             parser.transform.parent = this.transform;
-            parser.GetComponent<XMLParser>()._ParseWithCallback(input, callback, callbackId, cb_frameLimit);
+            parser.GetComponent<XMLParser>()._ParseAsync(xml, callback, callbackId, frameLimit);
         }
 
-        protected void _ParseWithCallback(string input, XMLParser_Callback callback, string callbackId, float frameLimit)
+        protected void _ParseAsync(string xml, XMLParser_Callback callback, string callbackId, float frameLimit)
         {
             cb_path = new DataList();
             cb_path.Add(XMLParser.InitDictionary());
-            cb_input = input;
+            cb_input = xml;
             cb_head = 0;
             cb_inCdataSection = false;
             cb_target = callback;
             cb_callbackId = callbackId;
-            cb_frameLimit = frameLimit;
+            this.frameLimit = frameLimit;
 
             cb_ready = true;
         }
@@ -341,7 +347,7 @@ namespace nekomimiStudio.parser.xml
         {
             if (cb_ready)
             {
-                cb_target.OnXMLParseIteration(cb_head, cb_input.Length);
+                cb_target.OnXMLParseIteration(cb_head, cb_input.Length, cb_callbackId);
                 DataDictionary state = new DataDictionary();
                 state.Add("path", cb_path);
                 state.Add("head", cb_head);
@@ -349,7 +355,7 @@ namespace nekomimiStudio.parser.xml
                 state.Add("data", cb_data);
 
                 var time = UnityEngine.Time.realtimeSinceStartup;
-                while (UnityEngine.Time.realtimeSinceStartup - time < cb_frameLimit)
+                while (UnityEngine.Time.realtimeSinceStartup - time < frameLimit)
                 {
                     if (cb_head < cb_input.Length)
                     {
@@ -379,21 +385,6 @@ namespace nekomimiStudio.parser.xml
                     }
                 }
             }
-        }
-
-        static string pathToStr(DataList path)
-        {
-            string res = "";
-            foreach (var i in path.ToArray())
-            {
-                DataToken tag;
-                if (i.TokenType == TokenType.DataDictionary)
-                {
-                    ((DataDictionary)i).TryGetValue("tag", out tag);
-                    res += (string)tag + "/";
-                }
-            }
-            return res;
         }
     }
 }

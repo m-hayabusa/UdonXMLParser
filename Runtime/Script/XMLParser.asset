@@ -469,13 +469,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: cb_frameLimit
+      Data: frameLimit
     - Name: $v
       Entry: 7
       Data: 24|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: cb_frameLimit
+      Data: frameLimit
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 25|System.RuntimeType, mscorlib

@@ -9,7 +9,7 @@ namespace nekomimiStudio.parser.xml
     {
 
         virtual public void OnXMLParseEnd(DataDictionary result, string callbackId) { }
-        virtual public void OnXMLParseIteration(int processing, int total) { }
+        virtual public void OnXMLParseIteration(int processing, int total, string callbackId) { }
 
     }
 }
