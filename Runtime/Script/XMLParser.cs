@@ -1,4 +1,4 @@
-
+﻿
 using UdonSharp;
 using VRC.SDK3.Data;
 
@@ -10,8 +10,10 @@ namespace nekomimiStudio.parser.xml
         {
             string[] query = path.Split('/');
             var elem = root;
-            for (int i = 1; i < query.Length; i++)
+            for (int i = 0; i < query.Length; i++)
             {
+                if (i == 0 && query[0] == "") continue;
+
                 var tag = "";
                 var idx = 0;
                 if (query[i].Contains("["))
