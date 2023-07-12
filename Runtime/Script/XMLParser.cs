@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using VRC.SDK3.Data;
 
@@ -170,19 +170,19 @@ namespace nekomimiStudio.parser.xml
                         }
 
                         var elem = new DataDictionary();
-                        var t = data.Split(new char[] { ' ', '\n' });
+                        var t = data.Split(new char[] { ' ', '\n', '\t' });
 
-                        elem.Add("tag", t[0]);
+                        elem.Add("tag", t[0].Trim());
 
                         // Debug.Log(pathToStr(path) + "/" + t[0]);
 
                         var attr = new DataDictionary();
 
-                        var attr_head = data.IndexOfAny(new char[] { ' ', '\n' });
+                        var attr_head = data.IndexOfAny(new char[] { ' ', '\n', '\t' });
                         while (data.Length > attr_head + 1 && attr_head != -1)
                         {
                             attr_head++;
-                            var attr_end = data.IndexOfAny(new char[] { '=', ' ', '\n', '/', '>' }, attr_head);
+                            var attr_end = data.IndexOfAny(new char[] { '=', ' ', '\n', '\t' }, attr_head);
                             if (attr_end == -1) attr_end = data.Length - 1;
                             var key = data.Substring(attr_head, attr_end - attr_head);
                             attr_head = attr_end;
