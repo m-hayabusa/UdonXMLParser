@@ -1,12 +1,16 @@
 {
   "name": "studio.nekomimi.parser.xml",
   "displayName": "nS XMLParser",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "XML Parser.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/m-hayabusa/UdonXMLParser.git"
+  },
   "dependencies": {},
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.udonsharp": "1.1.8"
+    "com.vrchat.udonsharp": "~1.1.8"
   },
   "author": {
     "name": "mewl hayabusa",
