@@ -1,0 +1,99 @@
+name: Build Repo Listing
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Build Release]
+    types:
+      - completed
+  release:
+    types: [published, created, edited, unpublished, deleted, released]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "repo"
+  cancel-in-progress: true
+
+env:
+  vpmRepository: https://vpm.nekomimi.studio/index.json
+  pathToCi: ci
+
+jobs:
+  build-listing:
+    name: build-listing
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 # check out this repo
+
+      - name: m-hayabusa/vpm-repo
+        uses: actions/checkout@v3
+        with:
+          repository: m-hayabusa/vpm-repo
+          path: ${{env.pathToCi}}/vpm-repo
+          clean: false
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Merge Package Version Listing
+        run: >
+          node -e '
+            const fs = require("fs");
+
+            const package = JSON.parse(fs.readFileSync("./package.json"));
+            const basepkg = JSON.parse(fs.readFileSync("${{env.pathToCi}}/vpm-repo/index.json"));
+
+            package.url = "https://github.com/${{ github.repository }}/releases/download/" + package.version + "/" + package.name + "-" + package.version + ".zip?";
+
+            if (basepkg.packages[package.name] === undefined) basepkg.packages[package.name] = {};
+            if (basepkg.packages[package.name].versions === undefined) basepkg.packages[package.name].versions = {};
+            basepkg.packages[package.name].versions[package.version] = package;
+
+            fs.writeFileSync("${{env.pathToCi}}/vpm-repo/index.json", JSON.stringify(basepkg, undefined, "    "));
+          '
+
+      - name: Get version and name
+        run: >
+          node -e '
+            const fs = require("fs");
+            const package = JSON.parse(fs.readFileSync("./package.json"));
+            console.log("package_version=" + package.version);
+            console.log("package_displayName=" + package.displayName);
+          ' >> $GITHUB_ENV
+
+      - name: Create installer
+        run: >
+          mkdir ${{env.pathToCi}}/vpmPackage;
+          wget https://github.com/anatawa12/VPMPackageAutoInstaller/releases/latest/download/creator.mjs -O ${{env.pathToCi}}/vpmPackage/creator.mjs;
+          node -e '
+            const fs = require("fs");
+            const package = JSON.parse(fs.readFileSync("./package.json"));
+            const config = {};
+            config.vpmRepositories = ["${{env.vpmRepository}}"];
+            config.vpmDependencies = package.vpmDependencies;
+            if (config.vpmDependencies == undefined) config.vpmDependencies = {};
+            config.vpmDependencies[package.name] = package.version;
+            fs.writeFileSync("${{env.pathToCi}}/vpmPackage/config.json", JSON.stringify(config));
+          ';
+          node ${{env.pathToCi}}/vpmPackage/creator.mjs ${{env.pathToCi}}/vpmPackage/config.json "${{env.pathToCi}}/vpm-repo/installer/${{env.package_displayName}}-installer.unitypackage";
+
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: ${{env.pathToCi}}/vpm-repo
+          destination-github-username: "m-hayabusa"
+          destination-repository-name: "vpm-repo"
+          user-email: actions@mewl.me
+          target-branch: main
+          commit-message: ${{env.package_displayName}} v${{env.package_version}}
